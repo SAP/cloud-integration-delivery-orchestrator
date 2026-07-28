@@ -1,0 +1,74 @@
+{
+  "xsappname": "cpi-delivery",
+  "tenant-mode": "dedicated",
+  "scopes": [
+    { "name": "$XSAPPNAME.CpiTenant.Read", "description": "View CPI Tenants" },
+    { "name": "$XSAPPNAME.CpiTenant.Manage", "description": "Create and delete CPI Tenants" },
+    { "name": "$XSAPPNAME.DeliveryRule.Read", "description": "View Delivery Rules" },
+    { "name": "$XSAPPNAME.DeliveryRule.Manage", "description": "Create and delete Delivery Rules" },
+    { "name": "$XSAPPNAME.DeliveryRequest.Read", "description": "View Delivery Requests" },
+    { "name": "$XSAPPNAME.DeliveryRequest.Write", "description": "Create, edit and delete Delivery Requests" },
+    { "name": "$XSAPPNAME.DeliveryRequest.Operate", "description": "Execute DR operations (import, deploy, approve)" },
+    { "name": "$XSAPPNAME.VersionCompare.Read", "description": "View version compare results" },
+    { "name": "$XSAPPNAME.VersionCompare.Trigger", "description": "Trigger rule-based version compare" },
+    { "name": "$XSAPPNAME.VersionCompare.Adhoc", "description": "Trigger adhoc version compare across tenants" },
+    { "name": "$XSAPPNAME.Integration.Read", "description": "View TMS nodes, routes, CPI artifacts, destinations" },
+    {
+      "name": "$XSAPPNAME.Callback",
+      "description": "Technical callback scope (reserved for SaaS provisioning)",
+      "grant-as-authority-to-apps": ["$XSAPPNAME(application,sap-provisioning,tenant-onboarding)"]
+    }
+  ],
+  "role-templates": [
+    {
+      "name": "CpiDeliveryAdmin",
+      "description": "CPI Delivery Administrator — full access",
+      "scope-references": [
+        "$XSAPPNAME.CpiTenant.Read", "$XSAPPNAME.CpiTenant.Manage",
+        "$XSAPPNAME.DeliveryRule.Read", "$XSAPPNAME.DeliveryRule.Manage",
+        "$XSAPPNAME.DeliveryRequest.Read", "$XSAPPNAME.DeliveryRequest.Write", "$XSAPPNAME.DeliveryRequest.Operate",
+        "$XSAPPNAME.VersionCompare.Read", "$XSAPPNAME.VersionCompare.Trigger", "$XSAPPNAME.VersionCompare.Adhoc",
+        "$XSAPPNAME.Integration.Read"
+      ]
+    },
+    {
+      "name": "CpiDeliveryOperator",
+      "description": "CPI Delivery Operator — daily delivery operations",
+      "scope-references": [
+        "$XSAPPNAME.CpiTenant.Read",
+        "$XSAPPNAME.DeliveryRule.Read",
+        "$XSAPPNAME.DeliveryRequest.Read", "$XSAPPNAME.DeliveryRequest.Write", "$XSAPPNAME.DeliveryRequest.Operate",
+        "$XSAPPNAME.VersionCompare.Read", "$XSAPPNAME.VersionCompare.Trigger",
+        "$XSAPPNAME.Integration.Read"
+      ]
+    },
+    {
+      "name": "CpiDeliveryViewer",
+      "description": "CPI Delivery Viewer — read-only access",
+      "scope-references": [
+        "$XSAPPNAME.CpiTenant.Read",
+        "$XSAPPNAME.DeliveryRule.Read",
+        "$XSAPPNAME.DeliveryRequest.Read",
+        "$XSAPPNAME.VersionCompare.Read",
+        "$XSAPPNAME.Integration.Read"
+      ]
+    }
+  ],
+  "role-collections": [
+    {
+      "name": "CPI Delivery Admin",
+      "description": "Full access to CPI Delivery",
+      "role-template-references": ["$XSAPPNAME.CpiDeliveryAdmin"]
+    },
+    {
+      "name": "CPI Delivery Operator",
+      "description": "Operate deliveries in CPI Delivery",
+      "role-template-references": ["$XSAPPNAME.CpiDeliveryOperator"]
+    },
+    {
+      "name": "CPI Delivery Viewer",
+      "description": "Read-only access to CPI Delivery",
+      "role-template-references": ["$XSAPPNAME.CpiDeliveryViewer"]
+    }
+  ]
+}

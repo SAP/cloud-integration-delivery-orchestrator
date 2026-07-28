@@ -1,0 +1,71 @@
+_schema-version: "3.1.0"
+ID: cpi-delivery
+version: 1.0.0
+
+parameters:
+  app-host-prefix: ""
+  docker-image: ghcr.io/sap/cpi-delivery:latest
+  db-service-plan: development
+
+modules:
+  - name: cpi-delivery
+    type: application
+    build-parameters:
+      no-source: true
+    parameters:
+      docker:
+        image: ${docker-image}
+      memory: 1024M
+      disk-quota: 1024M
+      hosts:
+        - ${app-host-prefix}
+    requires:
+      - name: cpi-delivery-uaa
+      - name: cpi-delivery-uaa-api
+      - name: cpi-delivery-db
+      - name: cpi-delivery-dest
+      - name: cpi-delivery-conn
+      - name: cpi-delivery-cls
+
+resources:
+  - name: cpi-delivery-uaa
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: xsuaa
+      service-plan: application
+      path: xs-security.json
+
+  - name: cpi-delivery-uaa-api
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: xsuaa
+      service-plan: apiaccess
+
+  - name: cpi-delivery-db
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: postgresql-db
+      service-plan: ${db-service-plan}
+
+  - name: cpi-delivery-dest
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: destination
+      service-plan: lite
+
+  - name: cpi-delivery-conn
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: connectivity
+      service-plan: lite
+
+  - name: cpi-delivery-cls
+    type: org.cloudfoundry.managed-service
+    active: false
+    parameters:
+      service: cloud-logging
+      service-plan: standard
+      config:
+        ingest_otlp:
+          enabled: true
+        retention_period: 90

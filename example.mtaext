@@ -1,0 +1,48 @@
+# Copy this file, rename it (e.g. my-landscape.mtaext), fill in your values, and deploy:
+#   mbt build
+#   cf deploy mta_archives/cpi-delivery_1.0.0.mtar -e my-landscape.mtaext
+
+_schema-version: "3.1.0"
+ID: cpi-delivery-customer
+extends: cpi-delivery
+
+parameters:
+  # --- Required ---
+  app-host-prefix: "your-cpi-delivery-prefix"
+  docker-image: "ghcr.io/sap/cpi-delivery:latest"
+
+  # --- Optional ---
+  # db-service-plan: "standard"
+
+# --- Optional: override module parameters ---
+# modules:
+#   - name: cpi-delivery
+#     parameters:
+#       memory: 2048M
+#       instances: 2
+
+# --- Optional: bind to existing service instances ---
+# resources:
+#   - name: cpi-delivery-uaa
+#     parameters:
+#       service-name: my-xsuaa-instance
+#
+#   - name: cpi-delivery-uaa-api
+#     parameters:
+#       service-name: my-xsuaa-apiaccess
+#
+#   - name: cpi-delivery-db
+#     parameters:
+#       service-name: my-postgresql-db
+#
+#   - name: cpi-delivery-dest
+#     parameters:
+#       service-name: my-destination-service
+#
+#   - name: cpi-delivery-conn
+#     parameters:
+#       service-name: my-connectivity-service
+#
+#   # Enable SAP Cloud Logging (requires cloud-logging entitlement)
+#   - name: cpi-delivery-cls
+#     active: true
