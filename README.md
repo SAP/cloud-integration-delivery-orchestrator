@@ -70,7 +70,7 @@ extends: cpi-delivery
 
 parameters:
   app-host-prefix: "your-cpi-delivery-app-prefix"
-  docker-image: "ghcr.io/sap/cpi-delivery:latest"
+  docker-image: "ghcr.io/sap/cloud-integration-delivery-orchestrator:latest"
 ```
 
 #### Parameter Reference
@@ -146,7 +146,7 @@ Simply omit the CLS activation. The application deploys normally — all tracing
 
 ## Upgrade
 
-1. Update `docker-image` tag in your `.mtaext` (e.g. `ghcr.io/sap/cpi-delivery:1.1.0`)
+1. Update `docker-image` tag in your `.mtaext` (e.g. `ghcr.io/sap/cloud-integration-delivery-orchestrator:1.1.0`)
 2. Rebuild: `mbt build`
 3. Redeploy: `cf deploy mta_archives/cpi-delivery_<version>.mtar -e my-landscape.mtaext`
 

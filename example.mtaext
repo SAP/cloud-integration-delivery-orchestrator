@@ -9,7 +9,7 @@ extends: cpi-delivery
 parameters:
   # --- Required ---
   app-host-prefix: "your-cpi-delivery-prefix"
-  docker-image: "ghcr.io/sap/cpi-delivery:latest"
+  docker-image: "ghcr.io/sap/cloud-integration-delivery-orchestrator:latest"
 
   # --- Optional ---
   # db-service-plan: "standard"

@@ -4,7 +4,7 @@ version: 1.0.0
 
 parameters:
   app-host-prefix: ""
-  docker-image: ghcr.io/sap/cpi-delivery:latest
+  docker-image: ghcr.io/sap/cloud-integration-delivery-orchestrator:latest
   db-service-plan: development
 
 modules:
