@@ -51,7 +51,7 @@ mbt build
 cf login -a https://api.cf.<region>.hana.ondemand.com -o <org> -s <space>
 
 # Deploy
-cf deploy mta_archives/cpi-delivery_1.0.0.mtar -e my-landscape.mtaext
+cf deploy mta_archives/cloud-integration-delivery-orchestrator_1.0.0.mtar -e my-landscape.mtaext
 ```
 
 The MTA deployer will:
@@ -65,11 +65,11 @@ Copy `example.mtaext` and fill in your environment values:
 
 ```yaml
 _schema-version: "3.1.0"
-ID: cpi-delivery-myorg
-extends: cpi-delivery
+ID: cloud-integration-delivery-orchestrator-myorg
+extends: cloud-integration-delivery-orchestrator
 
 parameters:
-  app-host-prefix: "your-cpi-delivery-app-prefix"
+  app-host-prefix: "your-orchestrator-cf-app-prefix"
   docker-image: "ghcr.io/sap/cloud-integration-delivery-orchestrator:latest"
 ```
 
@@ -77,7 +77,7 @@ parameters:
 
 | Parameter | Required | Description |
 |-----------|----------|-------------|
-| `app-host-prefix` | Yes | URL prefix (e.g. `cpi-delivery` → `cpi-delivery.cfapps.eu10.hana.ondemand.com`) |
+| `app-host-prefix` | Yes | URL prefix (e.g. `orchestrator` → `orchestrator.cfapps.eu10.hana.ondemand.com`) |
 | `docker-image` | Yes | Full image reference with tag |
 | `db-service-plan` | No | PostgreSQL plan: `development` (default) or `standard` (production) |
 
@@ -87,7 +87,7 @@ If you already have service instances, override the `service-name` in the resour
 
 ```yaml
 resources:
-  - name: cpi-delivery-db
+  - name: cloud-integration-delivery-orchestrator-db
     parameters:
       service-name: my-existing-postgresql
 ```
@@ -102,9 +102,9 @@ In **BTP Cockpit → Security → Users → Assign Role Collection**:
 
 | Role Collection | Who | Access |
 |----------------|-----|--------|
-| CPI Delivery Admin | Platform administrators | Full access — manage tenants, rules, system config |
-| CPI Delivery Operator | DevOps engineers | Create/execute delivery requests, trigger version compare |
-| CPI Delivery Viewer | Stakeholders | Read-only access to all views |
+| Delivery Orchestrator Administrator | Platform administrators | Full access — manage tenants, rules, system config |
+| Delivery Orchestrator Operator | DevOps engineers | Create/execute delivery requests, trigger version compare |
+| Delivery Orchestrator Viewer | Stakeholders | Read-only access to all views |
 
 #### Configure Destinations
 
@@ -114,7 +114,7 @@ Configure CPI tenant connections in the application's **System Configuration** v
 
 ## Observability (SAP Cloud Logging)
 
-CPI Delivery integrates with SAP Cloud Logging (CLS) for centralized log aggregation, distributed tracing, and metrics. This feature is **opt-in** and requires a `cloud-logging` entitlement.
+Cloud Integration Delivery Orchestrator integrates with SAP Cloud Logging (CLS) for centralized log aggregation, distributed tracing, and metrics. This feature is **opt-in** and requires a `cloud-logging` entitlement.
 
 ### Enabling CLS
 
@@ -122,7 +122,7 @@ Add the following to your `.mtaext`:
 
 ```yaml
 resources:
-  - name: cpi-delivery-cls
+  - name: cloud-integration-delivery-orchestrator-cls
     active: true
 ```
 
@@ -134,8 +134,8 @@ On next deploy:
 ### Accessing Dashboards
 
 ```bash
-cf create-service-key cpi-delivery-cls my-key
-cf service-key cpi-delivery-cls my-key
+cf create-service-key cloud-integration-delivery-orchestrator-cls my-key
+cf service-key cloud-integration-delivery-orchestrator-cls my-key
 ```
 
 Open the `dashboards-endpoint` URL with `dashboards-username` / `dashboards-password` from the service key.
@@ -148,14 +148,14 @@ Simply omit the CLS activation. The application deploys normally — all tracing
 
 1. Update `docker-image` tag in your `.mtaext` (e.g. `ghcr.io/sap/cloud-integration-delivery-orchestrator:1.1.0`)
 2. Rebuild: `mbt build`
-3. Redeploy: `cf deploy mta_archives/cpi-delivery_<version>.mtar -e my-landscape.mtaext`
+3. Redeploy: `cf deploy mta_archives/cloud-integration-delivery-orchestrator_<version>.mtar -e my-landscape.mtaext`
 
 Service bindings and database are preserved automatically.
 
 ## Uninstall
 
 ```bash
-cf undeploy cpi-delivery --delete-services --delete-service-keys
+cf undeploy cloud-integration-delivery-orchestrator --delete-services --delete-service-keys
 ```
 
 > **Warning**: `--delete-services` removes the PostgreSQL instance and all data. Omit this flag to preserve the database.
@@ -164,9 +164,9 @@ cf undeploy cpi-delivery --delete-services --delete-service-keys
 
 | Symptom | Check |
 |---------|-------|
-| App fails to start | `cf logs cpi-delivery --recent` — verify image is accessible and service bindings are correct |
-| Login redirect fails | `cf env cpi-delivery` — verify both XSUAA bindings exist (application + apiaccess) |
-| Database errors | Migrations run on startup — check logs: `cf logs cpi-delivery --recent \| grep migrat` |
+| App fails to start | `cf logs cloud-integration-delivery-orchestrator --recent` — verify image is accessible and service bindings are correct |
+| Login redirect fails | `cf env cloud-integration-delivery-orchestrator` — verify both XSUAA bindings exist (application + apiaccess) |
+| Database errors | Migrations run on startup — check logs: `cf logs cloud-integration-delivery-orchestrator --recent \| grep migrat` |
 
 ## Support, Feedback, Contributing
 

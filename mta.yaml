@@ -1,5 +1,5 @@
 _schema-version: "3.1.0"
-ID: cpi-delivery
+ID: cloud-integration-delivery-orchestrator
 version: 1.0.0
 
 parameters:
@@ -8,7 +8,7 @@ parameters:
   db-service-plan: development
 
 modules:
-  - name: cpi-delivery
+  - name: cloud-integration-delivery-orchestrator
     type: application
     build-parameters:
       no-source: true
@@ -20,46 +20,46 @@ modules:
       hosts:
         - ${app-host-prefix}
     requires:
-      - name: cpi-delivery-uaa
-      - name: cpi-delivery-uaa-api
-      - name: cpi-delivery-db
-      - name: cpi-delivery-dest
-      - name: cpi-delivery-conn
-      - name: cpi-delivery-cls
+      - name: cloud-integration-delivery-orchestrator-uaa
+      - name: cloud-integration-delivery-orchestrator-uaa-api
+      - name: cloud-integration-delivery-orchestrator-db
+      - name: cloud-integration-delivery-orchestrator-dest
+      - name: cloud-integration-delivery-orchestrator-conn
+      - name: cloud-integration-delivery-orchestrator-cls
 
 resources:
-  - name: cpi-delivery-uaa
+  - name: cloud-integration-delivery-orchestrator-uaa
     type: org.cloudfoundry.managed-service
     parameters:
       service: xsuaa
       service-plan: application
       path: xs-security.json
 
-  - name: cpi-delivery-uaa-api
+  - name: cloud-integration-delivery-orchestrator-uaa-api
     type: org.cloudfoundry.managed-service
     parameters:
       service: xsuaa
       service-plan: apiaccess
 
-  - name: cpi-delivery-db
+  - name: cloud-integration-delivery-orchestrator-db
     type: org.cloudfoundry.managed-service
     parameters:
       service: postgresql-db
       service-plan: ${db-service-plan}
 
-  - name: cpi-delivery-dest
+  - name: cloud-integration-delivery-orchestrator-dest
     type: org.cloudfoundry.managed-service
     parameters:
       service: destination
       service-plan: lite
 
-  - name: cpi-delivery-conn
+  - name: cloud-integration-delivery-orchestrator-conn
     type: org.cloudfoundry.managed-service
     parameters:
       service: connectivity
       service-plan: lite
 
-  - name: cpi-delivery-cls
+  - name: cloud-integration-delivery-orchestrator-cls
     type: org.cloudfoundry.managed-service
     active: false
     parameters:
