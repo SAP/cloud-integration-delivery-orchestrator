@@ -1,14 +1,14 @@
 # Copy this file, rename it (e.g. my-landscape.mtaext), fill in your values, and deploy:
 #   mbt build
-#   cf deploy mta_archives/cpi-delivery_1.0.0.mtar -e my-landscape.mtaext
+#   cf deploy mta_archives/cloud-integration-delivery-orchestrator_1.0.0.mtar -e my-landscape.mtaext
 
 _schema-version: "3.1.0"
-ID: cpi-delivery-customer
-extends: cpi-delivery
+ID: cloud-integration-delivery-orchestrator-customer
+extends: cloud-integration-delivery-orchestrator
 
 parameters:
   # --- Required ---
-  app-host-prefix: "your-cpi-delivery-prefix"
+  app-host-prefix: "your-orchestrator-prefix"
   docker-image: "ghcr.io/sap/cloud-integration-delivery-orchestrator:latest"
 
   # --- Optional ---
@@ -16,33 +16,33 @@ parameters:
 
 # --- Optional: override module parameters ---
 # modules:
-#   - name: cpi-delivery
+#   - name: cloud-integration-delivery-orchestrator
 #     parameters:
 #       memory: 2048M
 #       instances: 2
 
 # --- Optional: bind to existing service instances ---
 # resources:
-#   - name: cpi-delivery-uaa
+#   - name: cloud-integration-delivery-orchestrator-uaa
 #     parameters:
 #       service-name: my-xsuaa-instance
 #
-#   - name: cpi-delivery-uaa-api
+#   - name: cloud-integration-delivery-orchestrator-uaa-api
 #     parameters:
 #       service-name: my-xsuaa-apiaccess
 #
-#   - name: cpi-delivery-db
+#   - name: cloud-integration-delivery-orchestrator-db
 #     parameters:
 #       service-name: my-postgresql-db
 #
-#   - name: cpi-delivery-dest
+#   - name: cloud-integration-delivery-orchestrator-dest
 #     parameters:
 #       service-name: my-destination-service
 #
-#   - name: cpi-delivery-conn
+#   - name: cloud-integration-delivery-orchestrator-conn
 #     parameters:
 #       service-name: my-connectivity-service
 #
 #   # Enable SAP Cloud Logging (requires cloud-logging entitlement)
-#   - name: cpi-delivery-cls
+#   - name: cloud-integration-delivery-orchestrator-cls
 #     active: true
