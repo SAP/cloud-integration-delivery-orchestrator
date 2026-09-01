@@ -8,7 +8,16 @@ Orchestrate SAP Cloud Integration delivery across multi-tenant landscapes — re
 
 Cloud Integration Delivery Orchestrator automates the transport, deployment, and governance of SAP Cloud Integration (CPI) artifacts across multiple tenants. It coordinates transport request generation, artifact export, and deployment into a single governed workflow via TMS and CPI OData APIs.
 
-The project distributes a pre-built Docker image deployed to SAP BTP Cloud Foundry via MTA descriptor. No source code is published — only the compiled application image and deployment configuration.
+The project distributes a pre-built Docker image deployed to SAP BTP Cloud Foundry via an MTA descriptor. This repository holds the deployment configuration (MTA descriptor, XSUAA security, extension templates); the application source code lives in the two repositories linked below.
+
+## Source Code
+
+The published Docker image is built from two open-source repositories:
+
+| Repository | Component | Stack |
+|------------|-----------|-------|
+| [cloud-integration-delivery-orchestrator-srv](https://github.com/SAP/cloud-integration-delivery-orchestrator-srv) | Backend service (REST API, WebSocket, XSUAA auth) | Go, Gin, GORM, PostgreSQL |
+| [cloud-integration-delivery-orchestrator-ui](https://github.com/SAP/cloud-integration-delivery-orchestrator-ui) | Web frontend (embedded into the backend image at build time) | Vue 3, TypeScript, Vite, UI5 Web Components |
 
 ## Requirements
 
