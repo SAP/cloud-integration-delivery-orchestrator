@@ -4,6 +4,16 @@
 
 Orchestrate SAP Cloud Integration delivery across multi-tenant landscapes — replace repetitive manual steps with a single governed workflow.
 
+## Try It on SAP BTP
+
+Deploy the pre-built Docker image to SAP BTP Cloud Foundry with the supplied MTA descriptor.
+
+[Start setup →](#setup)
+
+> For evaluation, use a non-productive landscape.
+
+**Need help?** Open a [GitHub Issue](https://github.com/SAP/cloud-integration-delivery-orchestrator/issues) — actively maintained by the team behind it.
+
 ## About This Project
 
 Cloud Integration Delivery Orchestrator automates the transport, deployment, and governance of SAP Cloud Integration (CPI) artifacts across multiple tenants. It coordinates transport request generation, artifact export, and deployment into a single governed workflow via TMS and CPI OData APIs.
@@ -28,18 +38,19 @@ The published Docker image is built from two open-source repositories:
 | Multiapps plugin | `cf install-plugin multiapps` |
 | MTA Build Tool | `npm install -g mbt` |
 
-### Required Entitlements
+### Required entitlements
 
 Ensure the following entitlements are assigned to your subaccount:
 
 | Service | Plan | Required |
 |---------|------|----------|
-| Authorization and Trust Management (xsuaa) | application, apiaccess | Yes |
-| PostgreSQL on SAP BTP | development / standard | Yes |
-| Destination Service | lite | Yes |
-| Connectivity Service | lite | Yes |
-| SAP Cloud Logging | standard | No (opt-in) |
+| Authorization and Trust Management Service (xsuaa) | application | Yes |
+| PostgreSQL, Hyperscaler Option(postgresql-db) | development / standard | Yes |
+| Destination Service(destination) | lite | Yes |
+| Connectivity Service(connectivity) | lite | No (opt-in) |
+| Cloud Logging(cloud-logging) | standard | No (opt-in) |
 
+---
 ## Setup
 
 ### 1. Deploy
@@ -50,8 +61,8 @@ git clone https://github.com/SAP/cloud-integration-delivery-orchestrator.git
 cd cloud-integration-delivery-orchestrator
 
 # Copy and configure the extension file
-cp example.mtaext my-landscape.mtaext
 # Edit my-landscape.mtaext with your values (see Configuration below)
+cp example.mtaext my-landscape.mtaext
 
 # Build MTA archive (descriptor only — image pulled from registry at deploy time)
 mbt build
@@ -64,7 +75,7 @@ cf deploy mta_archives/cloud-integration-delivery-orchestrator_1.0.0.mtar -e my-
 ```
 
 The MTA deployer will:
-1. Create/update service instances (XSUAA, PostgreSQL, Destination, Connectivity)
+1. Create/update service instances (XSUAA, PostgreSQL, Destination, Connectivity, etc.)
 2. Pull the Docker image from the registry
 3. Start the application with all service bindings
 
@@ -121,7 +132,7 @@ Configure CPI tenant connections in the application's **System Configuration** v
 - CPI OData endpoint — for artifact management
 - TMS endpoint — for transport request operations
 
-## Observability (SAP Cloud Logging)
+## Optional: Observability (SAP Cloud Logging)
 
 Cloud Integration Delivery Orchestrator integrates with SAP Cloud Logging (CLS) for centralized log aggregation, distributed tracing, and metrics. This feature is **opt-in** and requires a `cloud-logging` entitlement.
 
