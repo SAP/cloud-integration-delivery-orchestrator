@@ -20,14 +20,19 @@ modules:
       hosts:
         - ${app-host-prefix}
     requires:
+      # --- Mandatory services ---
       - name: cloud-integration-delivery-orchestrator-uaa
       - name: cloud-integration-delivery-orchestrator-uaa-api
       - name: cloud-integration-delivery-orchestrator-db
       - name: cloud-integration-delivery-orchestrator-dest
+      # --- Optional services (activate via mtaext) ---
       - name: cloud-integration-delivery-orchestrator-conn
       - name: cloud-integration-delivery-orchestrator-cls
+      - name: cloud-integration-delivery-orchestrator-ans
 
 resources:
+  # ── Mandatory ──────────────────────────────────────────────────────
+
   - name: cloud-integration-delivery-orchestrator-uaa
     type: org.cloudfoundry.managed-service
     parameters:
@@ -53,8 +58,11 @@ resources:
       service: destination
       service-plan: lite
 
+  # ── Optional (active: false — enable via mtaext) ───────────────────
+
   - name: cloud-integration-delivery-orchestrator-conn
     type: org.cloudfoundry.managed-service
+    active: false
     parameters:
       service: connectivity
       service-plan: lite
@@ -69,3 +77,10 @@ resources:
         ingest_otlp:
           enabled: true
         retention_period: 90
+
+  - name: cloud-integration-delivery-orchestrator-ans
+    type: org.cloudfoundry.managed-service
+    active: false
+    parameters:
+      service: alert-notification
+      service-plan: free

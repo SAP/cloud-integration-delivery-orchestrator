@@ -42,7 +42,18 @@ parameters:
 #   - name: cloud-integration-delivery-orchestrator-conn
 #     parameters:
 #       service-name: my-connectivity-service
-#
-#   # Enable SAP Cloud Logging (requires cloud-logging entitlement)
+
+# --- Optional services (default: inactive in mta.yaml) ---
+# Uncomment to enable. Requires the corresponding entitlement in the subaccount.
+
+#   # Connectivity Service — required for on-premise system access via Cloud Connector
+#   - name: cloud-integration-delivery-orchestrator-conn
+#     active: true
+
+#   # SAP Cloud Logging — observability (traces, metrics, logs)
 #   - name: cloud-integration-delivery-orchestrator-cls
+#     active: true
+
+#   # SAP Alert Notification Service — delivery event notifications (Email, Slack, Teams)
+#   - name: cloud-integration-delivery-orchestrator-ans
 #     active: true
