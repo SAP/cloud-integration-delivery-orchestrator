@@ -8,11 +8,107 @@ Orchestrate SAP Cloud Integration delivery across multi-tenant landscapes — re
 
 Deploy the pre-built Docker image to SAP BTP Cloud Foundry with the supplied MTA descriptor.
 
-[Start setup →](#setup)
+**[Start setup :rocket:](#setup)**
 
 > For evaluation, use a non-productive landscape.
 
 **Need help?** Open a [GitHub Issue](https://github.com/SAP/cloud-integration-delivery-orchestrator/issues) — actively maintained by the team behind it.
+
+## Who is this for?
+
+This project is a fit if you:
+
+- run **more than one SAP Cloud Integration tenant** and coordinate releases across them;
+- use **SAP Cloud Transport Management** for transport and routing; and
+- can deploy to a **BTP Cloud Foundry** subaccount with the required service entitlements.
+
+## Setup
+
+### Before you start
+
+| Requirement | Details |
+|-------------|---------|
+| SAP BTP CF environment | Subaccount with Cloud Foundry enabled |
+| CF CLI | [Download](https://github.com/cloudfoundry/cli/releases) |
+| Multiapps plugin | `cf install-plugin multiapps` |
+| MTA Build Tool | `npm install -g mbt` |
+
+Ensure the following entitlements are assigned to your subaccount:
+
+| Service | Plan | Required |
+|---------|------|----------|
+| Authorization and Trust Management Service (xsuaa) | application + apiaccess | Yes |
+| PostgreSQL, Hyperscaler Option (postgresql-db) | development / standard | Yes |
+| Destination Service (destination) | lite | Yes |
+| Connectivity Service (connectivity) | lite | No (opt-in) |
+| Cloud Logging (cloud-logging) | standard | No (opt-in) |
+| SAP Alert Notification service (alert-notification) | free | No (opt-in) |
+
+### 1. Configure your landscape
+
+Clone the repository and create your landscape file:
+
+```bash
+git clone https://github.com/SAP/cloud-integration-delivery-orchestrator.git
+cd cloud-integration-delivery-orchestrator
+
+cp example.mtaext your-landscape.mtaext
+# Edit your-landscape.mtaext
+```
+
+Minimal configuration in `your-landscape.mtaext`:
+
+```yaml
+_schema-version: "3.1.0"
+ID: cloud-integration-delivery-orchestrator-myorg
+extends: cloud-integration-delivery-orchestrator
+
+parameters:
+  # Required — URL prefix (e.g. orchestrator → orchestrator.cfapps.eu10.hana.ondemand.com)
+  app-host-prefix: "your-orchestrator-cf-app-prefix"
+  # Required — defaults to :latest; pin to a release tag if you prefer a fixed version
+  docker-image: "ghcr.io/sap/cloud-integration-delivery-orchestrator:latest"
+  # Optional — PostgreSQL plan: development (default) or standard (production)
+  # db-service-plan: "standard"
+```
+
+If you already have service instances, override the `service-name` in the resources section of your `.mtaext`. See `example.mtaext` for all available overrides.
+
+### 2. Build and deploy
+
+```bash
+mbt build
+
+cf login -a https://api.cf.<region>.hana.ondemand.com -o <org> -s <space>
+
+cf deploy mta_archives/cloud-integration-delivery-orchestrator_1.0.0.mtar -e your-landscape.mtaext
+```
+
+The MTA archive file name follows the `version` in `mta.yaml` (currently `1.0.0`). The deployer will:
+
+1. Create or update service instances (XSUAA, PostgreSQL, Destination, etc.)
+2. Pull the Docker image from the registry
+3. Start the application with all service bindings
+
+### 3. Complete setup
+
+- [ ] **Assign a role collection** in **BTP Cockpit → Security → Role Collections**, then assign it to your user:
+
+| Role Collection | Who | Access |
+|----------------|-----|--------|
+| Delivery Orchestrator Administrator | Platform administrators | Full access — manage tenants, rules, system config |
+| Delivery Orchestrator Operator | DevOps engineers | Create/execute delivery requests, trigger version compare |
+| Delivery Orchestrator Viewer | Stakeholders | Read-only access to all views |
+
+- [ ] **Open the application** at `https://<app-host-prefix>.cfapps.<region>.hana.ondemand.com` and sign in.
+- [ ] **Configure System Configuration** — the mandatory setting is the **TMS destination** for your transport landscape. CPI tenant connections are configured separately when you register tenants.
+- [ ] Run **Tenant Bootstrap** for a new tenant to validate prerequisites before the first delivery.
+
+**You are ready** when you can log in, see the home page, and open System Configuration.
+
+## Troubleshooting
+
+<!-- Reserved for validated deployment issues. Report problems via GitHub Issues in the meantime. -->
 
 ## About This Project
 
@@ -29,116 +125,23 @@ The published Docker image is built from two open-source repositories:
 | [cloud-integration-delivery-orchestrator-srv](https://github.com/SAP/cloud-integration-delivery-orchestrator-srv) | Backend service (REST API, WebSocket, XSUAA auth) | Go, Gin, GORM, PostgreSQL |
 | [cloud-integration-delivery-orchestrator-ui](https://github.com/SAP/cloud-integration-delivery-orchestrator-ui) | Web frontend (embedded into the backend image at build time) | Vue 3, TypeScript, Vite, UI5 Web Components |
 
-## Requirements
+## Optional services
 
-| Requirement | Details |
-|-------------|---------|
-| SAP BTP CF environment | Subaccount with Cloud Foundry enabled |
-| CF CLI | [Download](https://github.com/cloudfoundry/cli/releases) |
-| Multiapps plugin | `cf install-plugin multiapps` |
-| MTA Build Tool | `npm install -g mbt` |
+Three services are inactive by default in `mta.yaml`. Enable them in your `.mtaext` when needed, then redeploy.
 
-### Required entitlements
+### Connectivity Service
 
-Ensure the following entitlements are assigned to your subaccount:
-
-| Service | Plan | Required |
-|---------|------|----------|
-| Authorization and Trust Management Service (xsuaa) | application | Yes |
-| PostgreSQL, Hyperscaler Option(postgresql-db) | development / standard | Yes |
-| Destination Service(destination) | lite | Yes |
-| Connectivity Service(connectivity) | lite | No (opt-in) |
-| Cloud Logging(cloud-logging) | standard | No (opt-in) |
-
----
-## Setup
-
-### 1. Deploy
-
-```bash
-# Clone this repository
-git clone https://github.com/SAP/cloud-integration-delivery-orchestrator.git
-cd cloud-integration-delivery-orchestrator
-
-# Copy and configure the extension file
-# Edit my-landscape.mtaext with your values (see Configuration below)
-cp example.mtaext my-landscape.mtaext
-
-# Build MTA archive (descriptor only — image pulled from registry at deploy time)
-mbt build
-
-# Login to Cloud Foundry
-cf login -a https://api.cf.<region>.hana.ondemand.com -o <org> -s <space>
-
-# Deploy
-cf deploy mta_archives/cloud-integration-delivery-orchestrator_1.0.0.mtar -e my-landscape.mtaext
-```
-
-The MTA deployer will:
-1. Create/update service instances (XSUAA, PostgreSQL, Destination, Connectivity, etc.)
-2. Pull the Docker image from the registry
-3. Start the application with all service bindings
-
-### 2. Configure
-
-Copy `example.mtaext` and fill in your environment values:
-
-```yaml
-_schema-version: "3.1.0"
-ID: cloud-integration-delivery-orchestrator-myorg
-extends: cloud-integration-delivery-orchestrator
-
-parameters:
-  app-host-prefix: "your-orchestrator-cf-app-prefix"
-  docker-image: "ghcr.io/sap/cloud-integration-delivery-orchestrator:latest"
-```
-
-#### Parameter Reference
-
-| Parameter | Required | Description |
-|-----------|----------|-------------|
-| `app-host-prefix` | Yes | URL prefix (e.g. `orchestrator` → `orchestrator.cfapps.eu10.hana.ondemand.com`) |
-| `docker-image` | Yes | Full image reference with tag |
-| `db-service-plan` | No | PostgreSQL plan: `development` (default) or `standard` (production) |
-
-#### Binding to Existing Service Instances
-
-If you already have service instances, override the `service-name` in the resources section of your `.mtaext`:
+Not required for core delivery workflows. Enable it when your landscape needs on-premise connectivity through **SAP Cloud Connector** — for example, when GitHub is **GitHub Enterprise Server (GHES)** on your corporate network. In that case, Cloud Connector is required to reach GHES, which in turn enables **GitHub sync** and **BPMN Visual Diff** against repositories hosted there.
 
 ```yaml
 resources:
-  - name: cloud-integration-delivery-orchestrator-db
-    parameters:
-      service-name: my-existing-postgresql
+  - name: cloud-integration-delivery-orchestrator-conn
+    active: true
 ```
 
-See `example.mtaext` for all available overrides.
+### SAP Cloud Logging
 
-### 3. Post-Deployment
-
-#### Assign Role Collections
-
-In **BTP Cockpit → Security → Users → Assign Role Collection**:
-
-| Role Collection | Who | Access |
-|----------------|-----|--------|
-| Delivery Orchestrator Administrator | Platform administrators | Full access — manage tenants, rules, system config |
-| Delivery Orchestrator Operator | DevOps engineers | Create/execute delivery requests, trigger version compare |
-| Delivery Orchestrator Viewer | Stakeholders | Read-only access to all views |
-
-#### Configure Destinations
-
-Configure CPI tenant connections in the application's **System Configuration** view. Each CPI tenant requires:
-- CPI OData endpoint — for artifact management
-- TMS endpoint — for transport request operations
-
-## Optional: Observability (SAP Cloud Logging)
-
-Cloud Integration Delivery Orchestrator integrates with SAP Cloud Logging (CLS) for centralized log aggregation, distributed tracing, and metrics. This feature is **opt-in** and requires a `cloud-logging` entitlement.
-
-### Enabling CLS
-
-Add the following to your `.mtaext`:
+Centralized log aggregation, distributed tracing, and metrics. Requires a `cloud-logging` entitlement.
 
 ```yaml
 resources:
@@ -146,31 +149,26 @@ resources:
     active: true
 ```
 
-On next deploy:
-1. A `cloud-logging` service instance is created with OTLP ingestion enabled
-2. Application logs are automatically shipped via CF syslog drain
-3. Traces and metrics are exported via OTLP/gRPC with mTLS
+Without this entitlement, omit the block — the application deploys normally with no-op tracing and metrics.
 
-### Accessing Dashboards
+### SAP Alert Notification service
 
-```bash
-cf create-service-key cloud-integration-delivery-orchestrator-cls my-key
-cf service-key cloud-integration-delivery-orchestrator-cls my-key
+Delivery event notifications (e.g. Email, Slack, Microsoft Teams). Requires an `alert-notification` entitlement.
+
+```yaml
+resources:
+  - name: cloud-integration-delivery-orchestrator-ans
+    active: true
 ```
-
-Open the `dashboards-endpoint` URL with `dashboards-username` / `dashboards-password` from the service key.
-
-### Without CLS Entitlement
-
-Simply omit the CLS activation. The application deploys normally — all tracing and metrics code uses no-op implementations.
 
 ## Upgrade
 
-1. Update `docker-image` tag in your `.mtaext` (e.g. `ghcr.io/sap/cloud-integration-delivery-orchestrator:1.1.0`)
-2. Rebuild: `mbt build`
-3. Redeploy: `cf deploy mta_archives/cloud-integration-delivery-orchestrator_<version>.mtar -e my-landscape.mtaext`
+Most deployments keep `docker-image` on `:latest`. To pick up a new release:
 
-Service bindings and database are preserved automatically.
+1. Rebuild: `mbt build`
+2. Redeploy: `cf deploy mta_archives/cloud-integration-delivery-orchestrator_<version>.mtar -e your-landscape.mtaext`
+
+If you pin a specific image tag in `.mtaext`, update that tag before redeploying. Service bindings and database are preserved automatically.
 
 ## Uninstall
 
@@ -180,19 +178,12 @@ cf undeploy cloud-integration-delivery-orchestrator --delete-services --delete-s
 
 > **Warning**: `--delete-services` removes the PostgreSQL instance and all data. Omit this flag to preserve the database.
 
-## Troubleshooting
-
-| Symptom | Check |
-|---------|-------|
-| App fails to start | `cf logs cloud-integration-delivery-orchestrator --recent` — verify image is accessible and service bindings are correct |
-| Login redirect fails | `cf env cloud-integration-delivery-orchestrator` — verify both XSUAA bindings exist (application + apiaccess) |
-| Database errors | Migrations run on startup — check logs: `cf logs cloud-integration-delivery-orchestrator --recent \| grep migrat` |
-
 ## Support, Feedback, Contributing
 
 This project is open to feature requests/suggestions, bug reports etc. via [GitHub issues](https://github.com/SAP/cloud-integration-delivery-orchestrator/issues). Contribution and feedback are encouraged and always welcome. For more information about how to contribute, the project structure, as well as additional contribution information, see our [Contribution Guidelines](CONTRIBUTING.md).
 
 ## Security / Disclosure
+
 If you find any bug that may be a security problem, please follow our instructions at [in our security policy](https://github.com/SAP/cloud-integration-delivery-orchestrator/security/policy) on how to report it. Please do not create GitHub issues for security-related doubts or problems.
 
 ## Code of Conduct
