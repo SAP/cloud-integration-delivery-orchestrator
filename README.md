@@ -16,8 +16,6 @@ Deploy the pre-built Docker image to SAP BTP Cloud Foundry with the supplied MTA
 
 ## SAP Community articles
 
-Listed in publication order (oldest first).
-
 - [Set Up a Governed SAP Cloud Integration Delivery Flow — Now Open Source](https://community.sap.com/t5/integration-blog-posts/set-up-a-governed-sap-cloud-integration-delivery-flow-now-open-source/ba-p/14478314) — product overview, deployment on SAP BTP, and core capabilities.
 - [There Is No "Delivery" in SAP Cloud Integration](https://community.sap.com/t5/technology-blog-posts-by-sap/there-is-no-delivery-in-sap-cloud-integration/ba-p/14480822) — why transport, import, and deploy are separate steps today.
 - [See What Changed in an SAP Cloud Integration iFlow Before Moving It to Another Tenant](https://community.sap.com/t5/integration-blog-posts/see-what-changed-in-an-sap-cloud-integration-iflow-before-moving-it-to/ba-p/14485026) — Git snapshots, GitHub App sync, and BPMN Visual Diff for source-to-target artifact review.
