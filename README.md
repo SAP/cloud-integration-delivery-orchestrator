@@ -121,6 +121,8 @@ The MTA archive file name follows the `version` in `mta.yaml` (currently `1.0.0`
 
 Cloud Integration Delivery Orchestrator automates the transport, deployment, and governance of SAP Cloud Integration (CPI) artifacts across multiple tenants. It coordinates transport request generation, artifact export, and deployment into a single governed workflow via TMS and CPI OData APIs.
 
+![Cross-tenant delivery architecture](architecture.png)
+
 The project distributes a pre-built Docker image deployed to SAP BTP Cloud Foundry via an MTA descriptor. This repository holds the deployment configuration (MTA descriptor, XSUAA security, extension templates); the application source code lives in the two repositories linked below.
 
 ## Source Code
