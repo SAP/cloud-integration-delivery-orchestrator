@@ -39,6 +39,14 @@ resources:
       service: xsuaa
       service-plan: application
       path: xs-security.json
+      # Allow the login callback on the app's own route. XSUAA only redirects to URIs
+      # listed in redirect-uris (by default only localhost), so without this entry the
+      # login on the app route fails. Set here, not in xs-security.json: MTA placeholders
+      # resolve in config:, not in the path: file.
+      config:
+        oauth2-configuration:
+          redirect-uris:
+            - "https://${app-host-prefix}.${default-domain}/**"
 
   - name: cloud-integration-delivery-orchestrator-uaa-api
     type: org.cloudfoundry.managed-service
